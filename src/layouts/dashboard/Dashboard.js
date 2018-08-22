@@ -6,6 +6,20 @@ import getWeb3 from './../../util/getWeb3.js'
 
       var numbers = [1, 2, 3, 4, 5];
 
+class Popup extends React.Component {
+  render() {
+    return (
+      <div className='popup'>
+        <div className='popup_inner'>
+          <h1>{this.props.text}</h1>
+          <img src="https://loading.io/spinners/hairball/lg.hairball-spiral-ajax-loader.gif"/>
+        <p onClick={this.props.closePopup}>Click here for closing this window</p>
+        </div>
+      </div>
+    );
+  }
+}
+
 class Dashboard extends Component {
   constructor(props, { authData }) {
     super(props)
@@ -15,6 +29,7 @@ class Dashboard extends Component {
     //testing to mount ipfs
     this.state ={
       willShowLoader: false,
+      willShowAddProof: false,
       ipfsHash: '',
       storageValue: 0,
       web3: null,
@@ -26,6 +41,9 @@ class Dashboard extends Component {
       filedate :'',
       proofOwner :''
     }
+    this.state = {
+      showPopup: false
+    };
     this.captureFile = this.captureFile.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.getList = this.getList.bind(this);
@@ -33,8 +51,15 @@ class Dashboard extends Component {
     this.fill_map = this.fill_map.bind(this);
     this.validateUser = this.validateUser.bind(this);
     this.retrieve_tags = this.retrieve_tags.bind(this);
+    this.displayAddProof = this.displayAddProof.bind(this);
+    this.togglePopup = this.togglePopup.bind(this);
   }
 
+togglePopup() {
+    this.setState({
+      showPopup: !this.state.showPopup
+    });
+  }
 
  componentWillMount() {
       // Get network provider and web3 instance.
@@ -138,6 +163,7 @@ componentDidMount() {
 onSubmit(event){
   event.preventDefault()
   this.setState({willShowLoader: true});
+  this.togglePopup();
   ipfs.files.add(this.state.buffer,(error,result) => {
     if(error){
       console.error(error)
@@ -148,13 +174,19 @@ onSubmit(event){
       //  console.log('ifpsHash', this.state.ipfsHash)
       //})
       //console.log(file);
+      if(result[0].hash.length==46){
       this.simpleStorageInstance.createProof(result[0].hash, this.state.filename, this.state.filedate, { from: this.state.account }).then((res) => {
       if(this.refs.tag1.value!=0){
       console.log("create tag");
-      this.simpleStorageInstance.associateTags(this.refs.tag1.value,result[0].hash, { from: this.state.account });  
+      console.log(this.state.web3.toHex(this.refs.tag1.value));
+      console.log(this.state.web3.toAscii(this.state.web3.toHex(this.refs.tag1.value)));
+      this.simpleStorageInstance.associateTags(this.state.web3.toHex(this.refs.tag1.value),result[0].hash, { from: this.state.account });  
       }
+
         console.log('result', res)
         this.setState({willShowLoader:false})
+        this.setState({willShowAddProof: false});
+        this.togglePopup();
         //to improe: problem with the refresh
         setTimeout(
             function() {
@@ -164,9 +196,13 @@ onSubmit(event){
             10000
         );
       })
+      }
     })
 }
 
+displayAddProof() {
+  this.setState({willShowAddProof: true});
+ }
 
 getList(){
 //event.preventDefault()
@@ -185,10 +221,10 @@ getList(){
             setTimeout(
             function() {
                 this.getList2();
-                alert("timer working");
+               // alert("timer working");
             }
             .bind(this),
-            10000
+            1000
         );
             })
 }
@@ -232,15 +268,23 @@ displayList(){
 
 retrieve_tags(event){
     event.preventDefault();
-        this.simpleStorageInstance.retrieveTags.call(this.refs.tagtoretrieve.value).then(
+        this.simpleStorageInstance.retrieveTags.call(this.state.web3.toHex(this.refs.tagtoretrieve.value)).then(
           data => {
             var listofimages = data;
             console.log(data.toNumber());
-            this.simpleStorageInstance.retrieveHashFromTag.call(this.refs.tagtoretrieve.value,1).then(
+            this.setState({ tagproof: data.toNumber() })
+           // this.simpleStorageInstance.retrieveHashFromTag.call(this.state.web3.toHex(this.refs.tagtoretrieve.value),1).then(
+           //   data2 => {
+           //     console.log(data2);
+           //   });
+            for (var i = 0; i < data.toNumber(); i++) {
+                this.simpleStorageInstance.retrieveHashFromTag.call(this.state.web3.toHex(this.refs.tagtoretrieve.value),i).then(
               data2 => {
-                console.log(data2);
-                console.log(this.state.web3.toAscii(data2));
-              });
+                      var TagProofs = data2;
+                      this.TagItems[i] = data2;
+                      console.log(data2);
+                    })
+            }
           }
         );
 }
@@ -272,13 +316,19 @@ fill_map(event){
   render() {
      const listItems = this.Items.map((Item, index) =>{
   return (
-    <li key={index}><div><img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} alt='' height='200' width='200'/>{Item.imageName} - {Item.lastModified} </div></li>
+    //<li key={index}><div><img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} alt='' height='200' width='200'/>{Item.imageName} - {Item.lastModified} </div></li>
+    <div className="gallery">
+    <a target="_blank" href={`https://ipfs.io/ipfs/${Item.ipfsHash}`}>
+      <img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} alt={Item.imageName} width="300" height="200"/>
+    </a>
+    <div className="desc">{Item.imageName} - {Item.lastModified}</div>
+  </div>
     )
 });
 
      const listTagItems = this.TagItems.map((TagItem, index) =>{
   return (
-    <li key={index}><div><img src={`https://ipfs.io/ipfs/${TagItem.ipfsHash}`} alt='' height='200' width='200'/> </div></li>
+    <li key={index}><div><img src={`https://ipfs.io/ipfs/${TagItem}`} alt='' height='200' width='200'/> </div></li>
     )
 });
 
@@ -286,64 +336,49 @@ fill_map(event){
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1">
-            <h1>Dashboard</h1>
             <p><strong>Congratulations {this.props.authData.name}!</strong> If you're seeing this page, you've logged in with UPort successfully.</p>
           </div>
         </div>
-        {this.state.willShowLoader == true &&
-                    <h2>Currently loading</h2>
+        <div className="list_proof">
+            <h1>Dashboard</h1>
+            <h2>This is the list of all your proofs</h2>
+            {this.state.totalproof == 0 &&
+            <p>You have 0 proof at the moment</p>
+            }
+            {this.state.totalproof !== 0 &&
+            <p>This is the list of your ${this.state.totalproof} proofs</p>
+            }
+                {this.state.totalproof !== 0 &&
+                      <ul>
+                      {listItems}
+                      </ul>
                 }
-         <div className="add_proof">
+        </div>
+          <div className="add_proof">
+         <h1>You can add a proof here</h1>
+            <div className="buttonProof">
+                <button onClick={this.displayAddProof}>
+                    Add a Proof
+                </button>
+           </div>
+         {this.state.willShowAddProof == true &&
             <form onSubmit={this.onSubmit}>
               <input type="file" onChange={this.captureFile}/>
               <p>Choose how you want to tag this picture</p>
-              <input type="text" ref="tag1"/>
-              <input type="text" ref="tag2"/>
-              <input type="text" ref="tag3"/>
+              <p><label>Tag 1 : </label><input type="text" ref="tag1" maxlength="60"/></p>
+              <p><label>Tag 2 : </label><input type="text" ref="tag2" maxlength="60"/></p>
+              <p><label>Tag 3 : </label><input type="text" ref="tag3" maxlength="60"/></p>
               <input type="submit"/>
             </form>
-            <p>this is your proof of existence</p>
-            <img src={`https://ipfs.io/ipfs/${this.state.ipfsHash}`} alt=''/>
+          }  
         </div>
-        <div className="list_proof">
-            <button onClick={this.getList}>
-                    getList
-            </button>
-            <button onClick={this.displayList}>
-                    Display my proofs
-            </button>
-            <button onClick={this.fill_map}>
-                    fill map
-            </button>
-            <h2>This is the list of all your proofs</h2>
-            <p>you have ${this.state.totalproof} proof</p>
-                {this.state.totalproof !== 0 &&
-                    <ul>
-                      {listItems}
-                    </ul>
-                }
-        </div>
-         <div className="verify_proof">
-              <input id="prooftovalidate" ref="prooftovalidate" type="text" />
-              <input  type="button"
-              value="Verify the proof"
-              onClick={this.validateUser}/>
-            <p>here's the owner of the proof</p>
-            <p>${this.state.proofOwner}</p>
-        </div>
-          <div className="retrieve_tags">
-              <input id="tagtoretrieve" ref="tagtoretrieve" type="text" />
-              <input  type="button"
-              value="Search"
-              onClick={this.retrieve_tags}/>
-            <p>here's the different proofs</p>
-             <p>you have ${this.state.tagproof} proof</p>
-                {this.state.tagproof !== 0 &&
-                    <ul>
-                      {listTagItems}
-                    </ul>
-                }
-        </div>
+        {this.state.showPopup ? 
+          <Popup
+            text='Please wait for MetaMask message.'
+            closePopup={this.togglePopup}
+          />
+          : null
+        }
       </main>
     )
   }

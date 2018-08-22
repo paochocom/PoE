@@ -59,4 +59,17 @@ it("should test the 1st proof ownership", async () => {
 
   });
 
+//Test 4 : adding a tag to a proof
+it("should add a tag to a proof", async () => {
+    const simpleStorageInstance = await SimpleStorage.deployed();
+
+    await simpleStorageInstance.associateTags("TestTag", "TestHash", {from: owner});
+    await simpleStorageInstance.associateTags("TestTag", "TestHash2", {from: alice});
+    const countproof = await simpleStorageInstance.retrieveTags("TestTag", {from: owner});
+    //countproof = countproof.toNumber();
+    console.log(countproof.toNumber());
+    assert.equal(countproof.toNumber(), 2);
+
+  });
+
 });

@@ -12,8 +12,8 @@ React
 
 ## Setup
 
-* `git clone https://user.id@innersource.accenture.com/scm/et-si-bc/blockchain-academy-ethereum-platform.git`
-* `cd blockchain-academy-ethereum-platform/`
+* `git clone https://github.com/paochocom/PoE.git`
+* `cd PoE/`
 * `npm install`
 * (Optional) `npm install truffle -g`
   
@@ -21,18 +21,21 @@ React
 ## Building and the frontend
 
 1. 'truffle develop` to start a test blockchain instance 
-2. First run truffle compile, then truffle migrate.
-3. Then run `npm run start` to build the app via webpack and serve it on http://localhost:8080
+2. First run truffle compile, then truffle migrate. If ever you have an error when migrating, delete the 'build' folder and relaunch migration.
+3. Open a new terminal. Then run `npm run start` to build the app via webpack and serve it on http://localhost:3000
 
 ## How to Use
-Install and setup an account with Uport.
-Login via Uport and you will end up on the dashboard.
-On the dashboard you will display all the documents associated with your ID, if ever you already uploaded some.
-If that's not the case you can start uploading your first document. 
-Once uploaded the page refresh and show your document.
-You have a button next to each document to share / send the proof ot the document to someone.
-This will send a mail to the users with a link to the platform to validate the adress linked to that document.
+Install and setup an account with Uport. It will be necessary for login.
+Login via Uport and you will end up on your dashboard.
 
-You can also verify who else did upload which document. 
+1. The Dashboard
+It contains the list of all the proof you already uploaded to IPFS, and a form for submitting your proof of existence.
+Once uploaded the page refresh and show your document.
+
+2. Verify a proof
+This is the interface where you can validate the link between a proof and a user. By entering the hash of a document, it will show you which address is linked to that document
+
+3. Tag Search engine
+This is the interface where you can browse on all the proof submited by tag. You can search for a specific tag and the results will display.
 
 ## Common Errors

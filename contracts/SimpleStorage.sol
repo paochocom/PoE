@@ -25,7 +25,7 @@ contract SimpleStorage is Ownable{
   mapping (address => Proof[]) public ProofList;
   mapping (bytes32 => address) public UserList;
   //create a  correspondance between tag and ipfshhash
-  mapping (bytes32 => bytes32[]) public TagTable;
+  mapping (bytes32 => string[]) public TagTable;
 
  event ProofAssociated(address ownerHash, string ipfsHash);
  event ProofHash(string p);
@@ -148,24 +148,37 @@ function getProofs() public returns (address) {
   }
 
 //Function associate tag with IPFShash
-  function associateTags(string tag, string ipfshash) public returns (bool) {
-      TagTable[keccak256(abi.encode(tag))].push(keccak256(abi.encode(ipfshash)));
+  function associateTags(bytes32 tag, string ipfshash) public returns (bool) {
+      TagTable[tag].push(ipfshash);
         return true;
   }
 
+//  function associateTags(string tag, string ipfshash) public returns (bool) {
+//      TagTable[keccak256(abi.encode(tag))].push(keccak256(abi.encode(ipfshash)));
+//        return true;
+//  }  
+
   //Function associate tag with IPFShash
-  function retrieveTags(string tag) public view returns (uint256) {
+  function retrieveTags(bytes32 tag) public view returns (uint256) {
       //TagTable[keccak256(abi.encode(tag))].push(keccak256(abi.encode(ipfshash))
-     uint256 TagCount = TagTable[keccak256(abi.encode(tag))].length;
+     uint256 TagCount = TagTable[tag].length;
     // bytes32 testname = TagTable[keccak256(abi.encode(tag))][1];
         return (TagCount);
   } 
 
    //Function retrieve picturesHash from tag
-  function retrieveHashFromTag(string tag, uint i) public view returns (bytes32) {
+//  function retrieveHashFromTag(string tag, uint i) public view returns (bytes32) {
       //TagTable[keccak256(abi.encode(tag))].push(keccak256(abi.encode(ipfshash))
      //uint256 TagCount = TagTable[keccak256(abi.encode(tag))].length;
-     bytes32 hashValue = TagTable[keccak256(abi.encode(tag))][1];
+//     bytes32 hashValue = TagTable[keccak256(abi.encode(tag))][1];
+//        return (hashValue);
+//  }
+
+   //Function retrieve picturesHash from tag
+  function retrieveHashFromTag(bytes32 tag, uint i) public view returns (string) {
+      //TagTable[keccak256(abi.encode(tag))].push(keccak256(abi.encode(ipfshash))
+     //uint256 TagCount = TagTable[keccak256(abi.encode(tag))].length;
+     string hashValue = TagTable[tag][i];
         return (hashValue);
   }
 
