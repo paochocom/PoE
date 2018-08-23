@@ -22,7 +22,7 @@ class Popup extends React.Component {
   }
 }
 
-class Dashboard extends Component {
+class Edittag extends Component {
   constructor(props, { authData }) {
     super(props)
     authData = this.props
@@ -46,15 +46,14 @@ class Dashboard extends Component {
     this.state = {
       showPopup: false
     };
-    this.captureFile = this.captureFile.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.getList = this.getList.bind(this);
     this.displayList = this.displayList.bind(this);
     this.fill_map = this.fill_map.bind(this);
     this.validateUser = this.validateUser.bind(this);
     this.retrieve_tags = this.retrieve_tags.bind(this);
-    this.displayAddProof = this.displayAddProof.bind(this);
     this.togglePopup = this.togglePopup.bind(this);
+    console.log(this.props.params.idtagtoedit);
   }
 
 togglePopup() {
@@ -159,65 +158,18 @@ timeConverter(UNIX_timestamp){
   return time;
 }
 
-  captureFile(event){
-    console.log('function launched')
-    event.preventDefault()
-    const file = event.target.files[0]
-    console.log('file:', file)
-    this.setState({ filename: file.name })
-    this.setState({ filedate: file.lastModified })
-    const reader = new window.FileReader()
-    reader.readAsArrayBuffer(file)
-    reader.onloadend = () =>{
-      this.setState({buffer: Buffer(reader.result)})
-      console.log('buffer', this.state.buffer)
-    }
-  }
-
 onSubmit(event){
   event.preventDefault()
   this.setState({willShowLoader: true});
   this.togglePopup();
-  ipfs.files.add(this.state.buffer,(error,result) => {
-    if(error){
-      console.error(error)
-      return
-    }
-      //this.simpleStorageInstance.set(result[0].hash, { from: this.state.account }).then((r) => {
-      //  return this.setState({ ipfsHash: result[0].hash })
-      //  console.log('ifpsHash', this.state.ipfsHash)
-      //})
-      //console.log(file);
-      if(result[0].hash.length==46){
-      //this.simpleStorageInstance.createProof(result[0].hash, this.state.filename, this.state.filedate, { from: this.state.account }).then((res) => {
-      this.simpleStorageInstance.createProof(result[0].hash, this.state.filename, Date.now(), { from: this.state.account }).then((res) => {
       if(this.refs.tag1.value!=0){
-      console.log("create tag");
-      console.log(this.state.web3.toHex(this.refs.tag1.value));
-      console.log(this.state.web3.toAscii(this.state.web3.toHex(this.refs.tag1.value)));
-      this.simpleStorageInstance.associateTags(this.state.web3.toHex(this.refs.tag1.value),result[0].hash, { from: this.state.account });  
-      }
-
+  this.simpleStorageInstance.associateTags(this.state.web3.toHex(this.refs.tag1.value),this.props.params.idtagtoedit, { from: this.state.account }).then((res) => {
         console.log('result', res)
         this.setState({willShowLoader:false})
-        this.setState({willShowAddProof: false});
         this.togglePopup();
-        //to improe: problem with the refresh
-        setTimeout(
-            function() {
-                this.getList();
-            }
-            .bind(this),
-            10000
-        );
       })
-      }
-    })
+  }
 }
-
-displayAddProof() {
-  this.setState({willShowAddProof: true});
- }
 
 getList(){
 //event.preventDefault()
@@ -333,10 +285,8 @@ fill_map(event){
      const listItems = this.Items.map((Item, index) =>{
   return (
     //<li key={index}><div><img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} alt='' height='200' width='200'/>{Item.imageName} - {Item.lastModified} </div></li>
-        //<a target="_blank" href={`https://ipfs.io/ipfs/${Item.ipfsHash}`}>
     <div className="gallery">
-    <Link to={`/edittag/${Item.ipfsHash}`} className="addtag">Add a tag</Link>
-    <a href={`/edittag/${Item.ipfsHash}`}>
+    <a target="_blank" href={`https://ipfs.io/ipfs/${Item.ipfsHash}`}>
       <img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} alt={Item.imageName} width="300" height="200"/>
     </a>
     <div className="desc">{Item.imageName} <br/> {Item.lastModified}</div>
@@ -357,38 +307,18 @@ fill_map(event){
             <p><strong>Congratulations {this.props.authData.name}!</strong> If you're seeing this page, you've logged in with UPort successfully.</p>
           </div>
         </div>
-        <div className="list_proof">
-            <h1>Dashboard</h1>
-            <h2>This is the list of all your proofs</h2>
-            {this.state.totalproof == 0 &&
-            <p>You have 0 proof at the moment</p>
-            }
-            {this.state.totalproof !== 0 &&
-            <p>This is the list of your ${this.state.totalproof} proofs</p>
-            }
-                {this.state.totalproof !== 0 &&
-                      <ul>
-                      {listItems}
-                      </ul>
-                }
-        </div>
           <div className="add_proof">
-         <h1>You can add a proof here</h1>
-            <div className="buttonProof">
-                <button onClick={this.displayAddProof}>
-                    Add a Proof
-                </button>
-           </div>
-         {this.state.willShowAddProof == true &&
+             <div className="gallery">
+                <a target="_blank" href={`https://ipfs.io/ipfs/${this.props.params.idtagtoedit}`}>
+                  <img src={`https://ipfs.io/ipfs/${this.props.params.idtagtoedit}`} width="300" height="200"/>
+                </a>
+                <div className="desc">Tag Associé <br/>  - </div>
+              </div>
             <form onSubmit={this.onSubmit}>
-              <input type="file" onChange={this.captureFile}/>
               <p>Choose how you want to tag this picture</p>
-              <p><label>Tag 1 : </label><input type="text" ref="tag1" maxLength="60"/></p>
-              <p><label>Tag 2 : </label><input type="text" ref="tag2" maxLength="60"/></p>
-              <p><label>Tag 3 : </label><input type="text" ref="tag3" maxLength="60"/></p>
+              <p><label>Tag  : </label><input type="text" ref="tag1" maxLength="60"/></p>
               <input type="submit"/>
             </form>
-          }  
         </div>
         {this.state.showPopup ? 
           <Popup
@@ -402,4 +332,4 @@ fill_map(event){
   }
 }
 
-export default Dashboard
+export default Edittag

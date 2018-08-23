@@ -9,9 +9,6 @@ contract SimpleStorage is Ownable{
   // define ipfsHash
   string ipfsHash;
 
-   // set owner 
-  address owner;
-
   // Add a variable called Proofcount to count how much Proof per user 
   uint ProofCount;
 
@@ -29,7 +26,8 @@ contract SimpleStorage is Ownable{
 
  event ProofAssociated(address ownerHash, string ipfsHash);
  event ProofHash(string p);
-
+event debug(bool destroyed);
+event debug2(address destroyed);
 
 /* Implementation of design pattern / Circuit Breaker
 Modifier for owner actions*/
@@ -39,7 +37,9 @@ modifier ownerRestricted {
    } 
 
 // Function for killing the contract
-   function destroyContract() private ownerRestricted {
+   function destroyContract() public{
+     require(owner == msg.sender);
+     debug(true);
      selfdestruct(owner);
    }
 
@@ -68,47 +68,13 @@ struct User{
     ipfsHash = x;
   }
 
-//A function for associating standard documents to a user
-function fill_map() public returns (uint){
-    //Definintion of first test document
-    Proof memory proof1 = Proof({
-            countdocs: ProofTable.length,
-            ipfsHash : "test",
-            name : "testname",
-            time: 123,
-            owner:msg.sender
-        });
-    ProofTable.push(ProofTable.length);
-    Proofs[ProofTable.length]=proof1;
-
-    //Definintion of second test document    
-    Proof memory proof2 = Proof({
-            countdocs: ProofTable.length,
-            ipfsHash : "1",
-            name : "2",
-            time: 321,
-            owner:msg.sender
-        });
-
-    ProofTable.push(ProofTable.length);
-    Proofs[ProofTable.length]=proof2;
-    
-   //test for adding a proof for a user
-    ProofList[msg.sender].push(proof1);
-    ProofList[msg.sender].push(proof2);
-
-    //Sends back the lenght of the ProofList mapping for the user
-    return ProofList[msg.sender].length;
-
-  }
-
 //Function to retrieve the owner of a doc from the IPFSHash  
   function get() public view returns (string) {
     return ipfsHash;
   }
 
 //Function for creating a proof in the blockchain
-  function createProof(string _ipfsHash, string _name, uint256 _time) returns (uint) {
+  function createProof(string _ipfsHash, string _name, uint256 _time) public returns (uint) {
       Proof memory prooftemp = Proof({
             countdocs: ProofList[msg.sender].length,
             ipfsHash : _ipfsHash,
@@ -149,14 +115,11 @@ function getProofs() public returns (address) {
 
 //Function associate tag with IPFShash
   function associateTags(bytes32 tag, string ipfshash) public returns (bool) {
+    //Onlyowner of the proof can add a tag
+      require(getUser(ipfshash) == msg.sender);
       TagTable[tag].push(ipfshash);
         return true;
   }
-
-//  function associateTags(string tag, string ipfshash) public returns (bool) {
-//      TagTable[keccak256(abi.encode(tag))].push(keccak256(abi.encode(ipfshash)));
-//        return true;
-//  }  
 
   //Function associate tag with IPFShash
   function retrieveTags(bytes32 tag) public view returns (uint256) {
@@ -167,19 +130,8 @@ function getProofs() public returns (address) {
   } 
 
    //Function retrieve picturesHash from tag
-//  function retrieveHashFromTag(string tag, uint i) public view returns (bytes32) {
-      //TagTable[keccak256(abi.encode(tag))].push(keccak256(abi.encode(ipfshash))
-     //uint256 TagCount = TagTable[keccak256(abi.encode(tag))].length;
-//     bytes32 hashValue = TagTable[keccak256(abi.encode(tag))][1];
-//        return (hashValue);
-//  }
-
-   //Function retrieve picturesHash from tag
   function retrieveHashFromTag(bytes32 tag, uint i) public view returns (string) {
-      //TagTable[keccak256(abi.encode(tag))].push(keccak256(abi.encode(ipfshash))
-     //uint256 TagCount = TagTable[keccak256(abi.encode(tag))].length;
-     string hashValue = TagTable[tag][i];
-        return (hashValue);
+        return (TagTable[tag][i]);
   }
 
   /** @dev transfer contract to another owner */

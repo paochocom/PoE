@@ -27,6 +27,7 @@ class Tagsearch extends Component {
     //testing to mount ipfs
     this.state ={
       willShowLoader: false,
+      willShowSearch: false,
       ipfsHash: '',
       storageValue: 0,
       web3: null,
@@ -63,6 +64,15 @@ class Tagsearch extends Component {
     })
   }
 
+clean_list(){
+ this.Items =[{}];
+}
+
+display_results(){
+//event.preventDefault()
+  this.setState({ willShowSearch: true })
+}
+
   instantiateContract() {
     console.log("contract instantiate starting");
     /*
@@ -96,6 +106,7 @@ class Tagsearch extends Component {
 
 
 retrieve_tags(event){
+  this.clean_list();
     event.preventDefault();
         this.simpleStorageInstance.retrieveTags.call(this.state.web3.toHex(this.refs.tagtoretrieve.value)).then(
           data => {
@@ -111,7 +122,9 @@ retrieve_tags(event){
               data2 => {
 //                      this.TagItems[i] = data2;
                       //this.TagItems[i] = { ipfsHash: data2};
-                                  this.TagItems.push({ipfsHash: data2, test:"merde"});
+                      this.Items.push({ipfsHash: data2, test:"merde"});
+                      //this.Items[i] = {ipfsHash: data2, test:"merde"};
+                      console.log(i);
                       console.log(data2);
                       //let displaylist = [];
                       //displaylist = this.state.listTag.concat(<img key={data2} src={"https://ipfs.io/ipfs/" + data2} alt='' height='200' width='200'/>);
@@ -123,6 +136,14 @@ retrieve_tags(event){
 //            console.log(window.displaylist);
           }
         );
+        setTimeout(
+            function() {
+                this.display_results();
+               // alert("timer working");
+            }
+            .bind(this),
+            1000
+        );
 }
 
   render() {
@@ -130,15 +151,23 @@ retrieve_tags(event){
 //                {this.state.tagproof !== 0 &&
 //                    {this.state.displaylist}
 //                }
-console.log("tagitems");
-console.log(this.TagItems);
-    const listTagItems = this.TagItems.map((TagItem, index) =>{
-      console.log("listtagitems");
-  console.log(listTagItems);
+    const listItems = this.Items.map((Item, index) =>{
   return (
-    <li key={index}><img src={`https://ipfs.io/ipfs/${TagItem.ipfsHash}`} alt='' height='200' width='200'/></li>
+    //<li key={index}><div><img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} alt='' height='200' width='200'/>{Item.imageName} - {Item.lastModified} </div></li>
+    <div className="gallery tagsearch" key={index}>
+    <a target="_blank" href={`https://ipfs.io/ipfs/${Item.ipfsHash}`}>
+      <img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} width="300" height="200"/>
+    </a>
+    <div className="desc">
+    <p> Hash of the proof</p>
+    <p>{Item.ipfsHash}</p>
+    </div>
+  </div>
     )
 });
+
+console.log("tagitems");
+console.log(listItems);
 
     return(
       <main className="container">
@@ -158,10 +187,10 @@ console.log(this.TagItems);
               value="Search"
               onClick={this.retrieve_tags}/>
               </form>
-            <p>here's the different proofs</p>
-             <p>you have ${this.state.tagproof} proof</p>
               <h2>Here's the list of all the {this.state.tagproof} proofs associated with that tag : </h2>
-                    <ul>{listTagItems}</ul>
+              {this.state.willShowSearch == true &&
+                  <ul>{listItems}</ul>
+              }
         </div>
       </main>
     )

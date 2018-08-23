@@ -62,7 +62,7 @@ it("should test the 1st proof ownership", async () => {
 //Test 4 : adding a tag to a proof
 it("should add a tag to a proof", async () => {
     const simpleStorageInstance = await SimpleStorage.deployed();
-
+    //To raise an error the associate Tags function should be called on a proof not belonging by the caller
     await simpleStorageInstance.associateTags("TestTag", "TestHash", {from: owner});
     await simpleStorageInstance.associateTags("TestTag", "TestHash2", {from: alice});
     const countproof = await simpleStorageInstance.retrieveTags("TestTag", {from: owner});

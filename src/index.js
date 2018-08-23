@@ -13,6 +13,7 @@ import Verif from './layouts/verif/Verif'
 import Tagsearch from './layouts/tagsearch/Tagsearch'
 import Profile from './user/layouts/profile/Profile'
 import Create_proof from './layouts/createProof/Create_proof'
+import Edittag from './layouts/edittag/Edittag'
 
 // Redux Store
 import store from './store'
@@ -29,6 +30,7 @@ ReactDOM.render((
           <Route path="dashboard" component={UserIsAuthenticated(Dashboard)} />
           <Route path="profile" component={UserIsAuthenticated(Profile)} />
           <Route path="createProof" component={UserIsAuthenticated(Create_proof)} />
+          <Route path="edittag/:idtagtoedit" component={UserIsAuthenticated(Edittag)}/> 
         </Route>
       </Router>
     </Provider>
