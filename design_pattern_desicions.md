@@ -1,27 +1,29 @@
 # Design pattern decisions
 
 
-Most of the function implemented are view function with the purpose of getting data.
+Most of the function implemented are view function with the purpose of retrieving data for front end.
 All these function don't need a specific restriction. 
 There is 2 functions that change the state of the blockchain. 
 
 -> create Proof
 This function would add an item to an object array linked to the user. 
-Control on front end is done on the fields associated. i purposely don't pass the address of the owner as a paremeter on the function for not giving any chance to anyone to replace it , and creat ea  faulty proof.
-msg.sender is called directly in the core of the function, hence each proof is associated to the owner. 
+Control on front end is done on the fields associated. i purposely don't pass the address of the owner as a paremeter on the function for not giving any chance to anyone to replace it , and create a  faulty proof.
+msg.sender is called directly in the core of the function, hence each proof is associated to the owner.
+We use require to make sure that no identical Hash can be used. If the IpfsHash belong to someone already, no one can use it anymore.  
 
 -> Edit Tag
-This function would add a  tag toa  proof. we use modifiers to make sure that the one modifying the tag associated to the proof is the owner of the proof.
+This function would add a tag to a proof. 
+We make sure that the one modifying the tag associated to the proof is the owner of the proof using require /modifiers.
 
 
 ## Restricting access
+I decided to use as less as possible restriction on functions. Just functions changing the state of the blockchain have been limited. 
+Either for Logic reason (A proof can be used once only) or for security reason (No one should be able to add tag to your proofs / suicide function restricted to owner).
 
-Each function is either public (accessible by everyone) or has some restricting access depending on the role of the caller. Here follows as example the modifiers that checks for roles that i use all along the contract. 
-```
 
 ## Auto depreciation and mortal 
-
-There is a suicide function implemented in the event of something going bad. the owner can kill the contract.
+I added an emergency stop by implementing a suicide function. 
+In the event of something going bad, only the owner can kill the contract.
 
 ## Circuit Breaker
 There is also a function that would lock all possible upload or addition of proof with tags. 

@@ -50,7 +50,7 @@ class Edittag extends Component {
     this.getList = this.getList.bind(this);
     this.displayList = this.displayList.bind(this);
     this.fill_map = this.fill_map.bind(this);
-    this.validateUser = this.validateUser.bind(this);
+    //this.validateUser = this.validateUser.bind(this);
     this.retrieve_tags = this.retrieve_tags.bind(this);
     this.togglePopup = this.togglePopup.bind(this);
     console.log(this.props.params.idtagtoedit);
@@ -257,7 +257,7 @@ retrieve_tags(event){
         );
 }
 
-validateUser(event){
+/*validateUser(event){
     event.preventDefault()
         this.simpleStorageInstance.getUser.call(this.refs.prooftovalidate.value).then(
           data => {
@@ -266,7 +266,7 @@ validateUser(event){
             this.setState({ proofOwner: proofowner })
           }
         );
-}
+}*/
 
 fill_map(event){
   event.preventDefault()

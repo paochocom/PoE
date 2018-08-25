@@ -12,7 +12,7 @@ class Home extends Component {
                 <LoginButtonContainer />
             </span>
             <h3>How to login with Uport</h3>
-            <p>The React/Redux portions of the authentication fuctionality are provided by <a href="https://github.com/mjrussell/redux-auth-wrapper" target="_blank">mjrussell/redux-auth-wrapper</a>.</p>
+            <p>Just download Uport on your phone, follow the instructions. When you click on the login button, you'll see a qr code. Scan it with Uport App and you're connected.</p>
             <h3>Further Reading</h3>
             <p>You can find in the readme.md all the explanation needed about the project.</p>
           </div>

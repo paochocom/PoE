@@ -8,34 +8,41 @@ contract TestSimpleStorage {
     SimpleStorage simpleStorage = SimpleStorage(DeployedAddresses.SimpleStorage());
 
     event test_value(address value1);
+
    //Test 1 :  Validating the correct creation of a proof
   function testItStoresAValue() public {
-    //call the contract function for creating proof
-    //var countproof = simpleStorage.createProof("TestHash", "TestName", 123);
+    //We create a first proof and validate the return ( in this case 1 the number of proof created by the user)
     var countproof = simpleStorage.createProof("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG", "TestPicture", 1534324966);
     Assert.equal(countproof,1, 'It should show a correct creation of a proof.');
 
+    //We create a second proof and validate the return ( in this case 2 the number of proof created by the user)
     var countproof2 = simpleStorage.createProof("TestHash", "TestName", 123);
-    Assert.equal(countproof2,2, 'It should show a correct creation of a proof.');
-    //verify the name of the proof
-//    var test = compareStrings("testvalue","testvalue");
-    
- //   Assert.isTrue(test, 'It should store the value testvalue.');
+    Assert.equal(countproof2,2, 'It should show a correct creation for the second proof.');
+
   }
 
 
 
-//Verify the correct hash is being stored
+//Verify the value of the ipfsHash
   function testValueVerification() public {
-    //call the contract function for getting proofs data
-    var (a, b, c, d, e) = simpleStorage.getProof(1);
+    //call the contract function for getting all the proofs data
+    var (a, b, c, d, e) = simpleStorage.getProof(0);
+    //comparing the ipfsHash of the proof created in previous function with the result of proof 0
     var test = compareStrings("QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",b);
-    //verify the name of the proof
-	Assert.isTrue(test, 'It should store the correct IPFSHash for value 1.');
+    //comparing the name of the proof created in previous function with the result of proof 0
+    var testname = compareStrings("TestPicture",c);
 
-	var (a2, b2, c2, d2, e2) = simpleStorage.getProof(2);
-    var test2 = compareStrings("TestHash",b2);
-    //verify the name of the proof
+    //Validate our assertions.
+	Assert.isTrue(test, 'It should store the correct IPFSHash for first proof.');
+  Assert.isTrue(test, 'It should store the correct Name for first proof.');
+
+	var (a2, b2, c2, d2, e2) = simpleStorage.getProof(1);
+  //comparing the ipfsHash of the proof created in previous function with the result of proof 1
+  var test2 = compareStrings("TestHash",b2);
+  //comparing the name of the proof created in previous function with the result of proof 0
+  var testname2 = compareStrings("TestName",c2);
+
+  //Validate our assertions.
 	Assert.isTrue(test2, 'It should store the correct IPFSHash for value 2.');
   }
 

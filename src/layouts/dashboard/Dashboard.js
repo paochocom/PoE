@@ -51,7 +51,7 @@ class Dashboard extends Component {
     this.getList = this.getList.bind(this);
     this.displayList = this.displayList.bind(this);
     this.fill_map = this.fill_map.bind(this);
-    this.validateUser = this.validateUser.bind(this);
+    //this.validateUser = this.validateUser.bind(this);
     this.retrieve_tags = this.retrieve_tags.bind(this);
     this.displayAddProof = this.displayAddProof.bind(this);
     this.togglePopup = this.togglePopup.bind(this);
@@ -109,28 +109,6 @@ togglePopup() {
         this.getList();
         return this.simpleStorageInstance.get.call(accounts[0])
         }).then((ipfsHash) => {
-        //If contract instantiate properly, we get the number of proof of the user
-       // this.simpleStorageInstance.fill_map.call(this.state.account).then(
-       //   data => {
-       //     var MachineList = data;
-            //toNumber to make it readable by Javascript
-       //     console.log(MachineList.toNumber());
-       //     this.setState({totalproof:MachineList.toNumber()})
-       //   }
-          //Get the proofList in an array
-      ///      this.simpleStorageInstance.getProofs.call(this.state.account).then(
-      ///          (data2) => {
-      ///            var ProofArray = data2;
-      ///            console.log("array return");
-      ///            console.log(ProofArray);
-      ///            console.log("end of array return");
-      ///          }
-      ///        )
-
-  //)
-        // Update state with the result.
-       // console.log()
-
         return this.setState({ ipfsHash })
       })
     })
@@ -183,13 +161,8 @@ onSubmit(event){
       console.error(error)
       return
     }
-      //this.simpleStorageInstance.set(result[0].hash, { from: this.state.account }).then((r) => {
-      //  return this.setState({ ipfsHash: result[0].hash })
-      //  console.log('ifpsHash', this.state.ipfsHash)
-      //})
-      //console.log(file);
+      //Making sure the lenght of the result is a ipfsHash
       if(result[0].hash.length==46){
-      //this.simpleStorageInstance.createProof(result[0].hash, this.state.filename, this.state.filedate, { from: this.state.account }).then((res) => {
       this.simpleStorageInstance.createProof(result[0].hash, this.state.filename, Date.now(), { from: this.state.account }).then((res) => {
       if(this.refs.tag1.value!=0){
       console.log("create tag");
@@ -202,7 +175,7 @@ onSubmit(event){
         this.setState({willShowLoader:false})
         this.setState({willShowAddProof: false});
         this.togglePopup();
-        //to improe: problem with the refresh
+        //to improve: problem with the refresh. using a timeout function to load automatically the proofs
         setTimeout(
             function() {
                 this.getList();
@@ -221,7 +194,7 @@ displayAddProof() {
 
 getList(){
 //event.preventDefault()
-  this.simpleStorageInstance.getProofsCount.call().then(
+  this.simpleStorageInstance.getProofsCount.call({ from: this.state.account }).then(
          data => {
             var ListProofs = data;
             //toNumber to make it readable by Javascript
@@ -246,38 +219,32 @@ getList(){
 
 getList2(){
 //event.preventDefault()
-  this.simpleStorageInstance.getProofsCount.call().then(
+  this.simpleStorageInstance.getProofsCount.call({ from: this.state.account }).then(
          data => {
             var ListProofs = data;
-            //toNumber to make it readable by Javascript
-            console.log("ListProofs");
-            console.log(ListProofs.toNumber());
             this.setState({ totalproof: ListProofs.toNumber() })
-            console.log("End ListProofs");
-            //this.setState({totalproof:MachineList.toNumber()})
           })
 }
 
 displayList(){
 //  event.preventDefault()
-  for (var i = 1; i < this.state.totalproof+1; i++) {
-      this.simpleStorageInstance.getProof.call(i).then(
+  //for (var i = 1; i < this.state.totalproof+1; i++) {
+    for (var i = 0; i < this.state.totalproof; i++) { 
+      this.simpleStorageInstance.getProof.call(i, this.state.account, { from: this.state.account }).then(
          data => {
             var ListProofs = data;
             //toNumber to make it readable by Javascript
+            console.log(data);
             console.log(i);
             console.log("Proof number :", ListProofs[0].toNumber());
             console.log("ipfsHash :", ListProofs[1]);
             console.log("image name :", ListProofs[2]);
-            //numbers.push(ListProofs[2]);
             console.log("last Modified : ", ListProofs[3].toNumber());
             console.log("Owner : ", ListProofs[4]);
-//            this.Items[ListProofs[0].toNumber()] = { ProofNumber: ListProofs[0].toNumber(), ipfsHash: ListProofs[1], imageName: ListProofs[2],lastModified: ListProofs[3].toNumber(),owner: ListProofs[4]};
+            console.log("msg.sender : ", ListProofs[5]);
             this.Items[ListProofs[0].toNumber()] = { ProofNumber: ListProofs[0].toNumber(), ipfsHash: ListProofs[1], imageName: ListProofs[2],lastModified: this.timeConverter(ListProofs[3].toNumber()),owner: ListProofs[4]};
-            //console.log(ListProofs);
             console.log("this item");
             console.log(this.Items[ListProofs[0].toNumber()]);
-            //this.setState({totalproof:MachineList.toNumber()})
           })
   }
 }
@@ -289,10 +256,6 @@ retrieve_tags(event){
             var listofimages = data;
             console.log(data.toNumber());
             this.setState({ tagproof: data.toNumber() })
-           // this.simpleStorageInstance.retrieveHashFromTag.call(this.state.web3.toHex(this.refs.tagtoretrieve.value),1).then(
-           //   data2 => {
-           //     console.log(data2);
-           //   });
             for (var i = 0; i < data.toNumber(); i++) {
                 this.simpleStorageInstance.retrieveHashFromTag.call(this.state.web3.toHex(this.refs.tagtoretrieve.value),i).then(
               data2 => {
@@ -305,7 +268,7 @@ retrieve_tags(event){
         );
 }
 
-validateUser(event){
+/*validateUser(event){
     event.preventDefault()
         this.simpleStorageInstance.getUser.call(this.refs.prooftovalidate.value).then(
           data => {
@@ -314,7 +277,7 @@ validateUser(event){
             this.setState({ proofOwner: proofowner })
           }
         );
-}
+}*/
 
 fill_map(event){
   event.preventDefault()
@@ -325,15 +288,12 @@ fill_map(event){
             console.log("ListProofs");
             console.log(ListProofs.toNumber());
             console.log("End ListProofs");
-            //this.setState({totalproof:MachineList.toNumber()})
           })
 }
 
   render() {
      const listItems = this.Items.map((Item, index) =>{
   return (
-    //<li key={index}><div><img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} alt='' height='200' width='200'/>{Item.imageName} - {Item.lastModified} </div></li>
-        //<a target="_blank" href={`https://ipfs.io/ipfs/${Item.ipfsHash}`}>
     <div className="gallery">
     <Link to={`/edittag/${Item.ipfsHash}`} className="addtag">Add a tag</Link>
     <a href={`/edittag/${Item.ipfsHash}`}>
@@ -355,6 +315,7 @@ fill_map(event){
         <div className="pure-g">
           <div className="pure-u-1-1">
             <p><strong>Congratulations {this.props.authData.name}!</strong> If you're seeing this page, you've logged in with UPort successfully.</p>
+            <p>your account is number {this.state.account}</p>
           </div>
         </div>
         <div className="list_proof">
@@ -384,8 +345,6 @@ fill_map(event){
               <input type="file" onChange={this.captureFile}/>
               <p>Choose how you want to tag this picture</p>
               <p><label>Tag 1 : </label><input type="text" ref="tag1" maxLength="60"/></p>
-              <p><label>Tag 2 : </label><input type="text" ref="tag2" maxLength="60"/></p>
-              <p><label>Tag 3 : </label><input type="text" ref="tag3" maxLength="60"/></p>
               <input type="submit"/>
             </form>
           }  

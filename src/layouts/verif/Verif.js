@@ -24,6 +24,18 @@ class Verif extends Component {
     this.validateUser = this.validateUser.bind(this);
   }
 
+timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  var hour = a.getHours();
+  var min = a.getMinutes();
+  var sec = a.getSeconds();
+  var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+  return time;
+}
 
  componentWillMount() {
       // Get network provider and web3 instance.
@@ -78,12 +90,25 @@ class Verif extends Component {
 
 validateUser(event){
     event.preventDefault()
+    this.setState({ ipfsHash: this.refs.prooftovalidate.value })
         this.simpleStorageInstance.getUser.call(this.refs.prooftovalidate.value).then(
           data => {
             var proofowner = data;
             //Update ProofOwner validator
             this.setState({ proofOwner: proofowner })
+        this.simpleStorageInstance.getIndex.call(this.refs.prooftovalidate.value).then(
+          data2 => {
+            var index = data2.toNumber();
+            console.log(data2.toNumber());
+            this.simpleStorageInstance.getTimeStamp.call(index).then(
+              data3 => {
+                console.log(data3.toNumber());
+                this.setState({filedate:this.timeConverter(data3.toNumber())})
+              }
+            );
           }
+        );
+                }
         );
 }
 
@@ -105,8 +130,11 @@ validateUser(event){
               <input  type="button"
               value="Verify the proof"
               onClick={this.validateUser}/>
-            <p>here's the owner of the proof</p>
-            <p>${this.state.proofOwner}</p>
+            <div className="gallery">
+              <img src={`https://ipfs.io/ipfs/${this.state.ipfsHash}`} width="300" height="200"/>
+            </div>
+            <p>Owner of the proof : {this.state.proofOwner}</p>
+            <p>Time when the proof was uploaded : {this.state.filedate}</p>
         </div>
       </main>
     )
