@@ -21,14 +21,14 @@ I decided to use as less as possible restriction on functions. Just functions ch
 Either for Logic reason (A proof can be used once only) or for security reason (No one should be able to add tag to your proofs / suicide function restricted to owner).
 
 
-## Auto depreciation and mortal 
+## Circuit Breaker
 I added an emergency stop by implementing a suicide function. 
 In the event of something going bad, only the owner can kill the contract.
-
-## Circuit Breaker
-There is also a function that would lock all possible upload or addition of proof with tags. 
-This can be called by the owner of the contract. It can be a  preventive measure before killing the contract. 
+We could also think about a "pause" mode activable by the owner for not allowing anyone to add more tags or proof untill reopened by the owner. 
 
 ## State Machine
 
 To the best of my knowledge and understanding of the course, i did my best to implement a contract that allows to have a coherent and stable state. 
+
+## Reflexions
+I decided to go for the most simple implementation. A more complex way could have been done using the "Factory Contract" design pattern and have a factory deploying "child" contracts for each proof created. It would require more time, but i believe it would have been a cleaner way to do it. 

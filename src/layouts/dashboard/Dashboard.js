@@ -300,6 +300,10 @@ fill_map(event){
       <img src={`https://ipfs.io/ipfs/${Item.ipfsHash}`} alt={Item.imageName} width="300" height="200"/>
     </a>
     <div className="desc">{Item.imageName} <br/> {Item.lastModified}</div>
+    <div className="hashproof">
+    <p>Hash of the proof :</p>
+    <p> {Item.ipfsHash}</p>
+    </div>
   </div>
     )
 });

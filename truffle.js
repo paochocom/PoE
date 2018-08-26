@@ -3,9 +3,9 @@ module.exports = {
     development: {
       host: "127.0.0.1",
       //If you want to test on truffle develop keep port 9545
-      port: 9545,
+      //port: 9545,
       //If you want to test with ganache deactivate port 9545 and activate port 8545
-      //port: 8545,
+      port: 8545,
       network_id: "*" // Match any network id
     },
     rinkeby: {

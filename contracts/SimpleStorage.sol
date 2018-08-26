@@ -30,9 +30,6 @@ contract SimpleStorage is Ownable{
   mapping (bytes32 => string[]) public TagTable;
 
  event ProofAssociated(address ownerHash, string ipfsHash);
- event ProofHash(string p);
-  event debug(bool destroyed);
-  event debug2(address destroyed);
 
 /* Implementation of design pattern / Circuit Breaker
 Modifier for owner actions*/

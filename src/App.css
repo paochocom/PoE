@@ -175,3 +175,19 @@ html, body, .app {
 .tagsearch:first-of-type { 
     display:none;
 }
+
+.verify_proof .gallery{
+  float:none;
+}
+
+.addtag{
+      margin-left: 50px;
+}
+
+.hashproof{
+      font-size: small;
+    word-wrap: break-word;
+    width: 150px;
+    text-align: center;
+    margin-left: 15px;
+}

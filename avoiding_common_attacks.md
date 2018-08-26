@@ -4,22 +4,22 @@
 
 ### Logic bugs
 
-I wrote 5 tests Truffle framework. 
+I wrote 8 tests Truffle framework. 
 Some in Javascript some in solidity
-Can be found at  `../truffle/test/`
+Can be found at  `../truffle/test/`, they all aim at testing the logic of the application.
 
 ### Reentrancy calls 
 
 When the contract's functions call an external function, it is : 
 
 * either a function that is implemented within the contract. 
-* avoiding the usage of call.value to send instead.  
+* avoiding the usage of "call.value" to "send" instead.  
 * or functions external to the contracts : 
   * `selfdestruct()` to destruct the contract
 
 
 ### Timestamp Dependence
-TimeStamp is being recorded but called directly from the front end to avoid any possible manipulation on blockchain level.. 
+TimeStamp is being recorded but called directly from the front end to avoid any possible manipulation on blockchain level. 
 
 ## Integer Arithmetic Overflow
 There is no possibility for a user to overflow.
@@ -33,7 +33,7 @@ Data are passed along on several occasions :
 * When the owner enters a hash for verifying the proofs. 
 * When the owner use the tag search engine
 
-There is front end checks as for the lenght of the string for every field. 
+There is front end checks as for the lenght of the string of the fields. 
 Regarding the ipfsHash sent back when uploading the proof to IPFS, it is controlled to make sure the length of the IPFSHash doesn't exceed what's possible 
 
 Parameters are controled in terms of logic. 
